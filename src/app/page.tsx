@@ -2,10 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const isOnline =
-    typeof window !== "undefined" ? window.navigator.onLine : false;
+  const [isOnline, setIsOnline] = useState(false);
+
+  useEffect(() => {
+    // Periksa status koneksi saat pertama kali di-render
+    setIsOnline(window.navigator.onLine);
+
+    // Tambahkan event listener untuk perubahan status jaringan
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Bersihkan event listener saat komponen dilepas
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -29,9 +48,9 @@ export default function Home() {
           <li>
             Status:{" "}
             {isOnline ? (
-              <span className="bg-green-600 rounded-lg p-0.5">online</span>
+              <span className="bg-green-600 rounded-lg p-0.5">Online</span>
             ) : (
-              <span className="bg-red-600 rounded-lg p-0.5">online</span>
+              <span className="bg-red-600 rounded-lg p-0.5">Offline</span>
             )}
           </li>
         </ol>
